@@ -44,6 +44,7 @@ def get_snowflake_connection():
         role=SNOWFLAKE_ROLE
     )
 
+# para obtener el watermark de la tabla de destino en Snowflake (columna de fecha de modificación)
 def get_watermark(sf_conn, schema, tabla_landing, campo_cursor):
     cursor = sf_conn.cursor()
     try:

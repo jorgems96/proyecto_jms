@@ -1,14 +1,11 @@
-# ---------------------------------------------------------------
+
 # config.py
 # Constantes y configuración del proyecto
 # Tablas, schemas, credenciales y parámetros de conexión
 
 
-# ---------------------------------------------------------------
 
-# ---------------------------------------------------------------
 # SNOWFLAKE
-# ---------------------------------------------------------------
 SNOWFLAKE_USER     = "JORGEMS96"
 SNOWFLAKE_PASSWORD = "dJuniversidad.1"
 SNOWFLAKE_ACCOUNT  = "jrtuvgy-tq97242"
