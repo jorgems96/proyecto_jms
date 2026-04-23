@@ -61,7 +61,7 @@ def desplegar_capa_raw_automatica():
             insert_cols = ", ".join(columnas)
             insert_vals = ", ".join([f"source.{col}" for col in columnas])
 
-            # Blindaje: Solo añadimos la lógica de borrado si existe la columna _is_deleted en origen
+            # BORRADO LOGICO: añado logica de borrado si existe la columna _is_deleted en origen
             clausula_delete = "WHEN MATCHED AND source._is_deleted = TRUE THEN DELETE" if "_is_deleted" in [c.lower() for c in columnas] else ""
 
             script_sql = f"""
@@ -121,3 +121,112 @@ def desplegar_capa_raw_automatica():
     finally:
         conn.close()
         print("🔌 Conexión a Snowflake cerrada de forma segura.")
+
+
+
+
+#BORRADO LOGICO Y FISICO: Ahora tu código es "híbrido" (BORRADO LOGICO Y FISICO). Si borras la fila físicamente en Landing, 
+# la borra en Raw. Si solo la marcas como borrada lógicamente (si existe la columna), 
+# también la borra.
+
+        # script_sql = f"""
+        #     -- 0. Asegurar esquemas
+        #     CREATE SCHEMA IF NOT EXISTS {esquema_raw};
+        #     CREATE SCHEMA IF NOT EXISTS STREAMS;
+        #     CREATE SCHEMA IF NOT EXISTS TASKS;
+
+        #     -- 1. Tabla RAW
+        #     CREATE TABLE IF NOT EXISTS {esquema_raw}.{nombre_tabla} 
+        #     AS 
+        #     SELECT * FROM {esquema_landing}.{nombre_tabla}
+        #     QUALIFY ROW_NUMBER() OVER (PARTITION BY {clave_primaria} ORDER BY {orden_cdc}) = 1;
+
+        #     -- 2. STREAM
+        #     CREATE OR REPLACE STREAM STREAMS.STREAM_RAW_{nombre_proyecto}_{nombre_tabla} 
+        #     ON TABLE {esquema_landing}.{nombre_tabla};
+
+        #     -- 3. TASK con detección de Hard Delete
+        #     CREATE OR REPLACE TASK TASKS.TASK_RAW_{nombre_proyecto}_{nombre_tabla}
+        #     WAREHOUSE = COMPUTE_WH
+        #     SCHEDULE = '5 MINUTE'
+        #     WHEN SYSTEM$STREAM_HAS_DATA('STREAMS.STREAM_RAW_{nombre_proyecto}_{nombre_tabla}')
+        #     AS
+        #     MERGE INTO {esquema_raw}.{nombre_tabla} AS target
+        #     USING (
+        #         -- Importante: Mantenemos METADATA$ACTION para saber si es un borrado físico
+        #         SELECT *, METADATA$ACTION AS ACCION_CDC
+        #         FROM STREAMS.STREAM_RAW_{nombre_proyecto}_{nombre_tabla}
+        #         QUALIFY ROW_NUMBER() OVER (PARTITION BY {clave_primaria} ORDER BY {orden_cdc}) = 1
+        #     ) AS source
+        #     ON target.{clave_primaria} = source.{clave_primaria}
+            
+        #     -- SI LA ACCIÓN ES DELETE O TIENE EL FLAG DE BORRADO -> BORRAMOS EN RAW
+        #     WHEN MATCHED AND (source.ACCION_CDC = 'DELETE' {f"OR source._is_deleted = TRUE" if "_is_deleted" in [c.lower() for c in columnas] else ""}) 
+        #         THEN DELETE
+                
+        #     -- SI COINCIDE Y NO ES BORRADO -> ACTUALIZAMOS
+        #     WHEN MATCHED AND source.ACCION_CDC = 'INSERT' 
+        #         THEN UPDATE SET {update_set}
+                
+        #     -- SI NO EXISTE -> INSERTAMOS
+        #     WHEN NOT MATCHED AND source.ACCION_CDC = 'INSERT' 
+        #         THEN INSERT ({insert_cols}) VALUES ({insert_vals});
+
+        #     -- 4. Activar
+        #     ALTER TASK TASKS.TASK_RAW_{nombre_proyecto}_{nombre_tabla} RESUME;
+        #     """
+
+
+
+#BORRADO FISICO 
+
+# ... (código de arriba igual: detección de columnas y orden_cdc) ...
+            # update_set = ", ".join([f"{col} = source.{col}" for col in columnas])
+            # insert_cols = ", ".join(columnas)
+            # insert_vals = ", ".join([f"source.{col}" for col in columnas])
+
+            # # ¡HEMOS ELIMINADO LA VARIABLE clausula_delete PORQUE NO TIENES BORRADO LÓGICO!
+
+            # script_sql = f"""
+            # -- 0. Nos aseguramos de que todos los esquemas existen
+            # CREATE SCHEMA IF NOT EXISTS {esquema_raw};
+            # CREATE SCHEMA IF NOT EXISTS STREAMS;
+            # CREATE SCHEMA IF NOT EXISTS TASKS;
+
+            # -- 1. Creamos la tabla RAW (Carga inicial deduplicada usando orden_cdc)
+            # CREATE TABLE IF NOT EXISTS {esquema_raw}.{nombre_tabla} 
+            # AS 
+            # SELECT * FROM {esquema_landing}.{nombre_tabla}
+            # QUALIFY ROW_NUMBER() OVER (PARTITION BY {clave_primaria} ORDER BY {orden_cdc}) = 1;
+
+            # -- 2. Creamos el STREAM dentro del esquema STREAMS
+            # CREATE OR REPLACE STREAM STREAMS.STREAM_RAW_{nombre_proyecto}_{nombre_tabla} 
+            # ON TABLE {esquema_landing}.{nombre_tabla};
+
+            # -- 3. Creamos la TASK dentro del esquema TASKS
+            # CREATE OR REPLACE TASK TASKS.TASK_RAW_{nombre_proyecto}_{nombre_tabla}
+            # WAREHOUSE = COMPUTE_WH
+            # SCHEDULE = '5 MINUTE'
+            # WHEN SYSTEM$STREAM_HAS_DATA('STREAMS.STREAM_RAW_{nombre_proyecto}_{nombre_tabla}')
+            # AS
+            # MERGE INTO {esquema_raw}.{nombre_tabla} AS target
+            # USING (
+            #     -- Mantenemos METADATA$ACTION para saber si Snowflake detectó un DELETE físico en Landing
+            #     SELECT *, METADATA$ACTION AS ACCION_CDC
+            #     FROM STREAMS.STREAM_RAW_{nombre_proyecto}_{nombre_tabla}
+            #     QUALIFY ROW_NUMBER() OVER (PARTITION BY {clave_primaria} ORDER BY {orden_cdc}) = 1
+            # ) AS source
+            # ON target.{clave_primaria} = source.{clave_primaria}
+            
+            # -- SI EL STREAM DICE QUE FUE UN BORRADO FÍSICO -> BORRAMOS EN RAW
+            # WHEN MATCHED AND source.ACCION_CDC = 'DELETE' THEN DELETE
+            
+            # -- SI COINCIDE Y ES UN DATO NUEVO/ACTUALIZADO -> ACTUALIZAMOS EN RAW
+            # WHEN MATCHED AND source.ACCION_CDC = 'INSERT' THEN UPDATE SET {update_set}
+            
+            # -- SI NO EXISTE EN RAW -> INSERTAMOS
+            # WHEN NOT MATCHED AND source.ACCION_CDC = 'INSERT' THEN INSERT ({insert_cols}) VALUES ({insert_vals});
+
+            # -- 4. Activamos la TASK apuntando a su esquema correcto
+            # ALTER TASK TASKS.TASK_RAW_{nombre_proyecto}_{nombre_tabla} RESUME;
+            # """
