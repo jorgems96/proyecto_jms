@@ -1,17 +1,6 @@
-
-# config.py
-# Constantes y configuración del proyecto
-# Tablas, schemas, credenciales y parámetros de conexión
-
-
-
-# SNOWFLAKE
-SNOWFLAKE_USER     = "JORGEMS96"
-SNOWFLAKE_PASSWORD = "dJuniversidad.1"
-SNOWFLAKE_ACCOUNT  = "jrtuvgy-tq97242"
-SNOWFLAKE_WAREHOUSE = "COMPUTE_WH"
-SNOWFLAKE_DATABASE = "PROYECTO"
-SNOWFLAKE_ROLE     = "ACCOUNTADMIN"
+# datos.py
+import os
+from dotenv import load_dotenv
 
 # ---------------------------------------------------------------
 # FUENTE 1: MEDICARE (Azure SQL Server)
@@ -19,9 +8,7 @@ SNOWFLAKE_ROLE     = "ACCOUNTADMIN"
 # Valor: nombre de la tabla en LANDING_MEDICARE (Snowflake, minúsculas)
 # ---------------------------------------------------------------
 SCHEMA_LANDING_MEDICARE = "LANDING_MEDICARE"
-# Para consultar el watermark en Snowflake (donde dlt normaliza a mayúsculas con guión bajo)
 CAMPO_CURSOR_MEDICARE_SNOWFLAKE = "FECHA_MODIFICACION"
-# Para el cursor de dlt (nombre original en SQL Server)
 CAMPO_CURSOR_MEDICARE_ORIGEN = "FechaModificacion"
 
 TABLAS_MEDICARE = {
@@ -63,7 +50,5 @@ TABLAS_NEXTBIO = {
 # ---------------------------------------------------------------
 SCHEMA_LANDING_PRODUCTOS = "LANDING_PRODUCTOS"
 TABLA_PRODUCTOS          = "PRODUCTOS_SANITARIOS"
-
-AZURE_ACCOUNT_NAME   = "sascvbootcamp"
 AZURE_CONTAINER_NAME = "productos"
-AZURE_SAS_TOKEN      = "sp=rl&st=2026-04-07T10:43:32Z&se=2026-06-30T18:58:32Z&sv=2025-11-05&sr=c&sig=2dhrhfePaVhLt0CEHAlogDUXteDSbdZDc1VM6xefJHI%3D"
+

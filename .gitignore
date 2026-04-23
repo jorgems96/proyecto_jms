@@ -1,3 +1,7 @@
+#credenciales
+.env
+
+
 # dlt-specific ignores
 # secrets and credentials
 secrets.toml

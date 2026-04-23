@@ -1,9 +1,4 @@
-# ---------------------------------------------------------------
-# proyecto_pipeline.py
-# Pipeline de ingesta incremental hacia Snowflake (capa LANDING)
-# Fuentes: MEDICARE (SQL Server), NEXTBIO (PostgreSQL), CSV (Azure Blob)
-# ---------------------------------------------------------------
-
+# Source_a_Landing.py
 import os
 import io
 import csv
@@ -16,39 +11,20 @@ import sqlalchemy as sa
 from azure.storage.blob import BlobServiceClient
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-#Descomentar para silenciar logs amarillos de dlt
-logging.getLogger("dlt").setLevel(logging.ERROR)   
-
-
-
+# --- IMPORTANTE: Nueva importación ---
+from conexiones import get_snowflake_connection 
 from datos import (
-    SNOWFLAKE_USER, SNOWFLAKE_PASSWORD, SNOWFLAKE_ACCOUNT,
-    SNOWFLAKE_WAREHOUSE, SNOWFLAKE_DATABASE, SNOWFLAKE_ROLE,
     TABLAS_MEDICARE, SCHEMA_LANDING_MEDICARE, CAMPO_CURSOR_MEDICARE_SNOWFLAKE, CAMPO_CURSOR_MEDICARE_ORIGEN,
     TABLAS_NEXTBIO, SCHEMA_LANDING_NEXTBIO, CAMPO_CURSOR_NEXTBIO,
     SCHEMA_LANDING_PRODUCTOS, TABLA_PRODUCTOS,
-    AZURE_ACCOUNT_NAME, AZURE_CONTAINER_NAME, AZURE_SAS_TOKEN,
+    AZURE_CONTAINER_NAME
 )
-
-# ---------------------------------------------------------------
-# CONEXIONES Y HELPERS
-# ---------------------------------------------------------------
-def get_snowflake_connection():
-    import snowflake.connector
-    return snowflake.connector.connect(
-        user=SNOWFLAKE_USER,
-        password=SNOWFLAKE_PASSWORD,
-        account=SNOWFLAKE_ACCOUNT,
-        warehouse=SNOWFLAKE_WAREHOUSE,
-        database=SNOWFLAKE_DATABASE,
-        role=SNOWFLAKE_ROLE
-    )
 
 # para obtener el watermark de la tabla de destino en Snowflake (columna de fecha de modificación)
 def get_watermark(sf_conn, schema, tabla_landing, campo_cursor):
     cursor = sf_conn.cursor()
     try:
-        cursor.execute(f"SELECT COALESCE(MAX({campo_cursor}), '1900-01-01'::TIMESTAMP) FROM {SNOWFLAKE_DATABASE}.{schema}.{tabla_landing.upper()}")
+        cursor.execute(f"SELECT COALESCE(MAX({campo_cursor}), '1900-01-01'::TIMESTAMP) FROM {schema}.{tabla_landing.upper()}")
         result = cursor.fetchone()[0]
         if isinstance(result, str):
             return datetime.strptime(result[:19], '%Y-%m-%d %H:%M:%S')
@@ -190,7 +166,7 @@ def load_productos_landing() -> None:
     sf_conn = get_snowflake_connection()
     cursor = sf_conn.cursor()
     try:
-        cursor.execute(f"SELECT DISTINCT FICHERO_ORIGEN FROM {SNOWFLAKE_DATABASE}.{SCHEMA_LANDING_PRODUCTOS}.{TABLA_PRODUCTOS}")
+        cursor.execute(f"SELECT DISTINCT FICHERO_ORIGEN FROM {SCHEMA_LANDING_PRODUCTOS}.{TABLA_PRODUCTOS}")
         ficheros_procesados = {row[0] for row in cursor.fetchall()}
     except Exception:
         ficheros_procesados = set()
@@ -198,8 +174,8 @@ def load_productos_landing() -> None:
         cursor.close()
 
     blob_service = BlobServiceClient(
-        account_url=f"https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net",
-        credential=AZURE_SAS_TOKEN
+        account_url=f"https://{dlt.secrets['azure_storage_account_name']}.blob.core.windows.net",
+        credential=dlt.secrets['azure_storage_sas_token']
     )
     container_client = blob_service.get_container_client(AZURE_CONTAINER_NAME)
     blobs = [b.name for b in container_client.list_blobs() if b.name.endswith(".csv")]
@@ -270,9 +246,9 @@ def run_pipeline_seguro(pipeline, data, **kwargs):
 
 
 # ---------------------------------------------------------------
-# MAIN
+# MAIN (Botón de arranque para el orquestador)
 # ---------------------------------------------------------------
-if __name__ == '__main__':
+def ejecutar_extraccion_completa():
     funciones = [
         load_medicare_landing,
         load_nextbio_landing,
@@ -288,3 +264,5 @@ if __name__ == '__main__':
                 future.result()
             except Exception as e:
                 print(f"[ERROR] {nombre} falló: {e}")
+
+    
