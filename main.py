@@ -8,8 +8,8 @@ if __name__ == "__main__":
     print("🚀 INICIANDO EL PIPELINE DE DATOS 🚀")
 
     # FASE 1: Independiente (Ella misma se conecta y se cierra)
-    #print("\n--- FASE 1: EXTRACCIÓN A LANDING ---")
-    #source_landing.ejecutar_extraccion_completa()
+    print("\n--- FASE 1: EXTRACCIÓN A LANDING ---")
+    source_landing.ejecutar_extraccion_completa()
 
     # FASE 2: Independiente (Ella misma se conecta y se cierra)
     print("\n--- FASE 2: DESPLIEGUE DE CAPA RAW ---")
