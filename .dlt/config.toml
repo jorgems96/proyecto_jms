@@ -10,3 +10,11 @@ table = "<configure me>" # fill this in!
 
 [destination.snowflake]
 enable_dataset_name_normalization = false
+
+
+[normalize]
+workers = 3
+
+[load]
+workers = 3
+

@@ -1,20 +1,20 @@
-# ---------------------------------------------------------------
 # reglas_calidad.py
 # Diccionario de reglas de calidad para la capa CLEANSED
 # Nombres de columnas en MAYUSCULAS_CON_GUION_BAJO (formato Snowflake/dlt)
 # Las filas que pasen las reglas se escriben en CLEANSED.NombreTabla
-# Las filas que NO pasen se escriben en CLEANSED.NombreTabla_errors
+# Las filas que NO pasen se mandan a CLEANSED.NombreTabla_errors
+
+# visitas ensayo lo del nivel 
 # ---------------------------------------------------------------
 
-# ---------------------------------------------------------------
-# Reglas reutilizables para varias tablas
-# ---------------------------------------------------------------
+#Reglas reutilizables para varias tablas
 NOT_NULL    = {"regla": "not_null"}
 POSITIVE    = {"regla": "positive"}
 NON_NEGATIVE = {"regla": "non_negative"}
 REGEX_EMAIL = {"regla": "regex", "patron": r"^[^@]+@[^@]+\.[^@]+$"}
 CLASE_RIESGO = {"regla": "allowed_values", "valores": ["I", "IIa", "IIb", "III"]}
 NIVEL_1_4    = {"regla": "allowed_values", "valores": [1, 2, 3, 4]}
+
 
 def allowed(valores):
     return {"regla": "allowed_values", "valores": valores}
@@ -28,9 +28,9 @@ def rango(minimo, maximo):
 # ---------------------------------------------------------------
 REGLAS_CALIDAD = {
 
-    # ---------------------------------------------------------------
-    # CATALOGO: productos_sanitarios
-    # ---------------------------------------------------------------
+
+# CATALOGO: productos_sanitarios
+
     "productos_sanitarios": [
         {"columna": "CODIGO_PRODUCTO",       **NOT_NULL},
         {"columna": "NOMBRE_PRODUCTO",       **NOT_NULL},
@@ -39,17 +39,17 @@ REGLAS_CALIDAD = {
         {"columna": "PRECIO_REFERENCIA_EUR", **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: especialidades
-    # ---------------------------------------------------------------
+
+# SGC: especialidades
+
     "especialidades": [
         {"columna": "CODIGO_ESPECIALIDAD", **NOT_NULL},
         {"columna": "NOMBRE_ESPECIALIDAD", **NOT_NULL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: medicos
-    # ---------------------------------------------------------------
+
+# SGC: medicos
+
     "medicos": [
         {"columna": "CODIGO_MEDICO",    **NOT_NULL},
         {"columna": "NOMBRE",           **NOT_NULL},
@@ -58,9 +58,9 @@ REGLAS_CALIDAD = {
         {"columna": "EMAIL",            **REGEX_EMAIL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: pacientes
-    # ---------------------------------------------------------------
+
+# SGC: pacientes
+
     "pacientes": [
         {"columna": "NUMERO_HISTORIA",  **NOT_NULL},
         {"columna": "NOMBRE",           **NOT_NULL},
@@ -72,26 +72,26 @@ REGLAS_CALIDAD = {
         {"columna": "EMAIL",            **REGEX_EMAIL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: diagnosticos_cie10
-    # ---------------------------------------------------------------
+
+# SGC: diagnosticos_cie10
+
     "diagnosticos_cie10": [
         {"columna": "CODIGO_CIE10", **NOT_NULL},
         {"columna": "DESCRIPCION",  **NOT_NULL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: paciente_diagnostico
-    # ---------------------------------------------------------------
+
+# SGC: paciente_diagnostico
+
     "paciente_diagnostico": [
         {"columna": "ID_PACIENTE",       **NOT_NULL},
         {"columna": "ID_DIAGNOSTICO",    **NOT_NULL},
         {"columna": "FECHA_DIAGNOSTICO", **NOT_NULL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: ensayos_clinicos
-    # ---------------------------------------------------------------
+
+# SGC: ensayos_clinicos
+
     "ensayos_clinicos": [
         {"columna": "CODIGO_ENSAYO",          **NOT_NULL},
         {"columna": "TITULO_ENSAYO",          **NOT_NULL},
@@ -100,9 +100,9 @@ REGLAS_CALIDAD = {
         {"columna": "OBJETIVO_RECLUTAMIENTO", **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: participacion_ensayos
-    # ---------------------------------------------------------------
+
+# SGC: participacion_ensayos
+
     "participacion_ensayos": [
         {"columna": "ID_ENSAYO",                  **NOT_NULL},
         {"columna": "ID_PACIENTE",                **NOT_NULL},
@@ -114,21 +114,21 @@ REGLAS_CALIDAD = {
         {"columna": "VIA_ADMINISTRACION",         **allowed(["ORL", "IV", "SC", "TOP", "INH"])},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: visitas_ensayo
-    # ---------------------------------------------------------------
+
+# SGC: visitas_ensayo
+
     "visitas_ensayo": [
         {"columna": "ID_PARTICIPACION",        **NOT_NULL},
         {"columna": "FECHA_VISITA",            **NOT_NULL},
         {"columna": "NUMERO_VISITA",           **POSITIVE},
         {"columna": "NIVEL_EFICACIA",          **rango(0.0, 1.0)},
         {"columna": "DOSIS_ADMINISTRADA",      **POSITIVE},
-        {"columna": "NUMERO_EFECTOS_ADVERSOS", **NON_NEGATIVE}, #PARA QUE SI TENGO UN 0, NO ME LO RECHACE PORQUE ES UN VALOR VÁLIDO
+        {"columna": "NUMERO_EFECTOS_ADVERSOS", **NON_NEGATIVE}, #PARA QUE SI TENGO UN 0, NO ME LO RECHACE PORQUE ES UN VALOR VÁLIDO, es lo mismo que mayor igual que cero
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: monitorizaciones
-    # ---------------------------------------------------------------
+
+# SGC: monitorizaciones
+
     "monitorizaciones": [
         {"columna": "ID_PACIENTE",          **NOT_NULL},
         {"columna": "ID_MEDICO",            **NOT_NULL},
@@ -136,9 +136,9 @@ REGLAS_CALIDAD = {
         {"columna": "FECHA_MONITORIZACION", **NOT_NULL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGC: lecturas_signos_vitales
-    # ---------------------------------------------------------------
+
+# SGC: lecturas_signos_vitales
+
     "lecturas_signos_vitales": [
         {"columna": "ID_MONITORIZACION",   **NOT_NULL},
         {"columna": "FRECUENCIA_CARDIACA", **rango(20, 300)},
@@ -149,27 +149,27 @@ REGLAS_CALIDAD = {
         {"columna": "NIVEL_GLUCOSA",       **rango(20, 600)},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: departamentos
-    # ---------------------------------------------------------------
+
+# SGEB: departamentos
+
     "departamentos": [
         {"columna": "CODIGO_DEPARTAMENTO", **NOT_NULL},
         {"columna": "NOMBRE_DEPARTAMENTO", **NOT_NULL},
         {"columna": "EMAIL_DEPARTAMENTO",  **REGEX_EMAIL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: fabricantes
-    # ---------------------------------------------------------------
+
+# SGEB: fabricantes
+
     "fabricantes": [
         {"columna": "CODIGO_FABRICANTE", **NOT_NULL},
         {"columna": "RAZON_SOCIAL",      **NOT_NULL},
         {"columna": "EMAIL_CONTACTO",    **REGEX_EMAIL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: ubicaciones
-    # ---------------------------------------------------------------
+
+# SGEB: ubicaciones
+
     "ubicaciones": [
         {"columna": "CODIGO_UBICACION", **NOT_NULL},
         {"columna": "EDIFICIO",         **NOT_NULL},
@@ -178,9 +178,9 @@ REGLAS_CALIDAD = {
         {"columna": "CAPACIDAD",        **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: equipos
-    # ---------------------------------------------------------------
+
+# SGEB: equipos
+
     "equipos": [
         {"columna": "CODIGO_EQUIPO",      **NOT_NULL},
         {"columna": "NOMBRE_EQUIPO",      **NOT_NULL},
@@ -193,9 +193,9 @@ REGLAS_CALIDAD = {
         {"columna": "PRECIO_ADQUISICION", **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: tecnicos
-    # ---------------------------------------------------------------
+
+# SGEB: tecnicos
+
     "tecnicos": [
         {"columna": "CODIGO_EMPLEADO",      **NOT_NULL},
         {"columna": "NOMBRE_TECNICO",       **NOT_NULL},
@@ -205,9 +205,9 @@ REGLAS_CALIDAD = {
         {"columna": "EMAIL_CORPORATIVO",    **REGEX_EMAIL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: ordenes_mantenimiento
-    # ---------------------------------------------------------------
+
+# SGEB: ordenes_mantenimiento
+
     "ordenes_mantenimiento": [
         {"columna": "NUMERO_ORDEN",       **NOT_NULL},
         {"columna": "ID_EQUIPO",          **NOT_NULL},
@@ -218,9 +218,9 @@ REGLAS_CALIDAD = {
         {"columna": "HORAS_TRABAJADAS",   **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: consumo_repuestos
-    # ---------------------------------------------------------------
+
+# SGEB: consumo_repuestos
+
     "consumo_repuestos": [
         {"columna": "ID_ORDEN",                   **NOT_NULL},
         {"columna": "ID_REPUESTO",                **NOT_NULL},
@@ -228,26 +228,26 @@ REGLAS_CALIDAD = {
         {"columna": "PRECIO_UNITARIO_EN_MOMENTO", **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: repuestos
-    # ---------------------------------------------------------------
+
+# SGEB: repuestos
+
     "repuestos": [
         {"columna": "CODIGO_REPUESTO", **NOT_NULL},
         {"columna": "NOMBRE_REPUESTO", **NOT_NULL},
         {"columna": "PRECIO_UNITARIO", **POSITIVE},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: categoria_equipos
-    # ---------------------------------------------------------------
+
+# SGEB: categoria_equipos
+
     "categoria_equipos": [
         {"columna": "CODIGO_CATEGORIA", **NOT_NULL},
         {"columna": "NOMBRE_CATEGORIA", **NOT_NULL},
     ],
 
-    # ---------------------------------------------------------------
-    # SGEB: planificacion_preventivos
-    # ---------------------------------------------------------------
+
+# SGEB: planificacion_preventivos
+
     "planificacion_preventivos": [
         {"columna": "ID_EQUIPO",         **NOT_NULL},
         {"columna": "FECHA_PLANIFICADA", **NOT_NULL},
