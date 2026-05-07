@@ -2,7 +2,8 @@
 import io
 import csv
 from datetime import datetime
-
+import sys
+sys.dont_write_bytecode = True # Evita la creación de archivos .pyc para mantener el proyecto limpio
 import dlt
 import sqlalchemy as sa
 from azure.storage.blob import BlobServiceClient
@@ -15,7 +16,7 @@ from datos import (
     SCHEMA_LANDING_PRODUCTOS, TABLA_PRODUCTOS,
     AZURE_CONTAINER_NAME
 )
-from utils import get_watermark, fetch_filas_incremental, get_column_hints
+from utilidades import get_watermark, fetch_filas_incremental, get_column_hints
 
 
 # ---------------------------------------------------------------

@@ -1,15 +1,17 @@
+import sys
+sys.dont_write_bytecode = True
 import re
 from datetime import datetime, timedelta
 import sqlalchemy as sa
 from sqlalchemy import types as sa_types
 
-
+#NORMALIZACION INTERNA DE DLT 
 def _to_snake_case(name: str) -> str:
     """Convierte CamelCase a snake_case para que coincida con la normalización interna de dlt."""
     name = re.sub(r'(?<=[a-z0-9])(?=[A-Z])', '_', name)
     return name.lower()
 
-
+#PARA LA CARGA INCREMENTAL: WATERMARK Y FILTRADO EN ORIGEN
 def get_watermark(sf_conn, schema, tabla, campo_cursor):
     """Devuelve el MAX de la columna de fecha ya cargada en Snowflake para esa tabla.
     Devuelve None si la tabla no existe o está vacía (primera carga: SELECT * sin filtro)."""
@@ -25,7 +27,7 @@ def get_watermark(sf_conn, schema, tabla, campo_cursor):
     finally:
         cursor.close()
 
-
+#PARA LA CARGA INCREMENTAL: EJECUTAR SELECT CON FILTRO DE WATERMARK
 def fetch_filas_incremental(conn, tabla_origen, campo_cursor, watermark, ingestion_time):
     """Ejecuta SELECT sobre la tabla origen con filtro incremental si hay watermark.
     Devuelve lista de dicts con fecha_ingestion añadida."""
@@ -45,7 +47,7 @@ def fetch_filas_incremental(conn, tabla_origen, campo_cursor, watermark, ingesti
         )
     return [{**dict(row._mapping), "fecha_ingestion": ingestion_time} for row in result]
 
-
+#ESTO ES PARA LOS TIPOS DE COLUMNAS EN DLT SEAN LOS CORRECTOS Y NO TODOS TEXT
 def _sa_type_to_dlt(sa_type):
     """Mapea un tipo SQLAlchemy al tipo dlt equivalente."""
     if isinstance(sa_type, (sa_types.Integer, sa_types.SmallInteger, sa_types.BigInteger)):
@@ -66,7 +68,7 @@ def _sa_type_to_dlt(sa_type):
         return "bool"
     return "text"
 
-
+#ESTO ES PARA LEER EL SCHEMA DE LA TABLA EN EL ORIGEN Y DEVOLVER LOS TYPE HINTS PARA DLT
 def get_column_hints(engine, tabla_origen):
     """Lee el schema de la tabla en el origen y devuelve los type hints para dlt.
     Las claves se normalizan a snake_case para que coincidan con la normalización de dlt.

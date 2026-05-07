@@ -4,7 +4,10 @@
 # Las filas que pasen las reglas se escriben en CLEANSED.NombreTabla
 # Las filas que NO pasen se mandan a CLEANSED.NombreTabla_errors
 
-# visitas ensayo lo del nivel 
+import sys
+sys.dont_write_bytecode = True # Evita la creación de archivos .pyc para mantener el proyecto limpio
+
+# visitas ensayo lo del nivel
 # ---------------------------------------------------------------
 
 #Reglas reutilizables para varias tablas
