@@ -12,6 +12,8 @@ def _to_snake_case(name: str) -> str:
     return name.lower()
 
 #PARA LA CARGA INCREMENTAL: WATERMARK Y FILTRADO EN ORIGEN
+#funcionamieno: get_watermark obtiene el maximo valor del campo de fecha en la tabla destino (Snowflake) 
+# para saber hasta donde se ha cargado. Si no hay datos, devuelve None.
 def get_watermark(sf_conn, schema, tabla, campo_cursor):
     """Devuelve el MAX de la columna de fecha ya cargada en Snowflake para esa tabla.
     Devuelve None si la tabla no existe o está vacía (primera carga: SELECT * sin filtro)."""

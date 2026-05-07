@@ -36,102 +36,24 @@ CREATE TABLE IF NOT EXISTS CONFORMED.DIM_PACIENTE (
 );
 
 
--- ============================================================
--- PASO 1: SCD1 — actualizar en sitio sin guardar historial
--- ============================================================
-UPDATE CONFORMED.DIM_PACIENTE t
-SET
-    NOMBRE           = s.NOMBRE,
-    APELLIDOS        = s.APELLIDOS,
-    FECHA_NACIMIENTO = s.FECHA_NACIMIENTO,
-    GENERO           = s.GENERO,
-    TELEFONO         = s.TELEFONO,
-    EMAIL            = s.EMAIL,
-    GRUPO_SANGUINEO  = s.GRUPO_SANGUINEO
-FROM (
-    SELECT
+CALL CONFORMED.SP_MERGE_SCD1_SCD2(
+    'CONFORMED.DIM_PACIENTE',
+    'SELECT
         ID_PACIENTE,
         NOMBRE,
-        APELLIDO1 || ' ' || APELLIDO2  AS APELLIDOS,
+        APELLIDO1 || '' '' || APELLIDO2  AS APELLIDOS,
         FECHA_NACIMIENTO,
-        SEXO                           AS GENERO,
-        TELEFONO_MOVIL                 AS TELEFONO,
+        SEXO                             AS GENERO,
+        TELEFONO_MOVIL                   AS TELEFONO,
         EMAIL,
-        GRUPO_SANGUINEO
-    FROM CLEANSED_MEDICARE.PACIENTES
-) s
-WHERE t.ID_PACIENTE = s.ID_PACIENTE
-  AND t.ES_ACTUAL   = TRUE
-  AND (
-      t.NOMBRE           IS DISTINCT FROM s.NOMBRE           OR
-      t.APELLIDOS        IS DISTINCT FROM s.APELLIDOS        OR
-      t.FECHA_NACIMIENTO IS DISTINCT FROM s.FECHA_NACIMIENTO OR
-      t.GENERO           IS DISTINCT FROM s.GENERO           OR
-      t.TELEFONO         IS DISTINCT FROM s.TELEFONO         OR
-      t.EMAIL            IS DISTINCT FROM s.EMAIL            OR
-      t.GRUPO_SANGUINEO  IS DISTINCT FROM s.GRUPO_SANGUINEO
-  );
-
-
--- ============================================================
--- PASO 2: SCD2 — cerrar version actual cuando cambia
---         Direccion, Ciudad, Codigo_Postal, Seguro_Medico o Tipo_Seguro
--- ============================================================
-UPDATE CONFORMED.DIM_PACIENTE t
-SET
-    FECHA_FIN = CURRENT_DATE - 1,
-    ES_ACTUAL = FALSE
-FROM (
-    SELECT
-        ID_PACIENTE,
+        GRUPO_SANGUINEO,
         DIRECCION,
         CIUDAD,
         CODIGO_POSTAL,
-        COMPANIA_SEGURO  AS SEGURO_MEDICO,
-        TIPO_COBERTURA   AS TIPO_SEGURO
-    FROM CLEANSED_MEDICARE.PACIENTES
-) s
-WHERE t.ID_PACIENTE = s.ID_PACIENTE
-  AND t.ES_ACTUAL   = TRUE
-  AND (
-      t.DIRECCION     IS DISTINCT FROM s.DIRECCION     OR
-      t.CIUDAD        IS DISTINCT FROM s.CIUDAD        OR
-      t.CODIGO_POSTAL IS DISTINCT FROM s.CODIGO_POSTAL OR
-      t.SEGURO_MEDICO IS DISTINCT FROM s.SEGURO_MEDICO OR
-      t.TIPO_SEGURO   IS DISTINCT FROM s.TIPO_SEGURO
-  );
-
-
--- ============================================================
--- PASO 3: INSERT — nueva version para registros cerrados en
---         paso 2 + pacientes nuevos que aun no existen
--- ============================================================
-INSERT INTO CONFORMED.DIM_PACIENTE (
-    ID_PACIENTE, NOMBRE, APELLIDOS, FECHA_NACIMIENTO, GENERO,
-    TELEFONO, EMAIL, GRUPO_SANGUINEO,
-    DIRECCION, CIUDAD, CODIGO_POSTAL, SEGURO_MEDICO, TIPO_SEGURO,
-    FECHA_INICIO, FECHA_FIN, ES_ACTUAL
-)
-SELECT
-    ID_PACIENTE,
-    NOMBRE,
-    APELLIDO1 || ' ' || APELLIDO2  AS APELLIDOS,
-    FECHA_NACIMIENTO,
-    SEXO                           AS GENERO,
-    TELEFONO_MOVIL                 AS TELEFONO,
-    EMAIL,
-    GRUPO_SANGUINEO,
-    DIRECCION,
-    CIUDAD,
-    CODIGO_POSTAL,
-    COMPANIA_SEGURO                AS SEGURO_MEDICO,
-    TIPO_COBERTURA                 AS TIPO_SEGURO,
-    CURRENT_DATE,
-    NULL,
-    TRUE
-FROM CLEANSED_MEDICARE.PACIENTES
-WHERE NOT EXISTS (
-    SELECT ID_PACIENTE FROM CONFORMED.DIM_PACIENTE
-    WHERE ID_PACIENTE = CLEANSED_MEDICARE.PACIENTES.ID_PACIENTE
-      AND ES_ACTUAL   = TRUE
+        COMPANIA_SEGURO                  AS SEGURO_MEDICO,
+        TIPO_COBERTURA                   AS TIPO_SEGURO
+     FROM CLEANSED_MEDICARE.PACIENTES',
+    'ID_PACIENTE',
+    'NOMBRE,APELLIDOS,FECHA_NACIMIENTO,GENERO,TELEFONO,EMAIL,GRUPO_SANGUINEO',
+    'DIRECCION,CIUDAD,CODIGO_POSTAL,SEGURO_MEDICO,TIPO_SEGURO'
 );

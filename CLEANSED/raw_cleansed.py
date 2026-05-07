@@ -86,8 +86,8 @@ def desplegar_capa_cleansed_automatica():
                 condicion_invalida_merge   = "1=0"
                 print(f"   Sin reglas definidas. Todo pasa a CLEANSED.")
 
-            nombre_stream = f"STREAMS.STREAM_CLEANSED_{nombre_proyecto}_{nombre_tabla}"
-            nombre_task   = f"TASKS.TASK_CLEANSED_{nombre_proyecto}_{nombre_tabla}"
+            nombre_stream = f"{esquema_cleansed}.STREAM_{nombre_tabla}"
+            nombre_task   = f"{esquema_cleansed}.TASK_{nombre_tabla}"
 
             conn.execute_string(_cargar_sql(
                 "streams_tasks.sql", "SETUP",

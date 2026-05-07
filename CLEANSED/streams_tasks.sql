@@ -6,15 +6,13 @@
 
 
 CREATE SCHEMA IF NOT EXISTS {esquema_cleansed};
-CREATE SCHEMA IF NOT EXISTS STREAMS;
-CREATE SCHEMA IF NOT EXISTS TASKS;
 
 CREATE TABLE IF NOT EXISTS {esquema_cleansed}.{nombre_tabla}
-AS SELECT * FROM {esquema_raw}.{nombre_tabla}
+AS SELECT * EXCLUDE (_DLT_LOAD_ID, _DLT_ID) FROM {esquema_raw}.{nombre_tabla}
 WHERE {condicion_valida_inicial};
 
 CREATE TABLE IF NOT EXISTS {esquema_cleansed}.{nombre_tabla}_ERRORS
-AS SELECT * FROM {esquema_raw}.{nombre_tabla}
+AS SELECT * EXCLUDE (_DLT_LOAD_ID, _DLT_ID) FROM {esquema_raw}.{nombre_tabla}
 WHERE {condicion_invalida_inicial};
 
 CREATE OR REPLACE STREAM {nombre_stream} ON TABLE {esquema_raw}.{nombre_tabla};
