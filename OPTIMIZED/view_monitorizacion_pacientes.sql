@@ -1,0 +1,73 @@
+-- monitorizacion_pacientes.sql
+-- Definicion de referencia de OPTIMIZED.MONITORIZACION_PACIENTES
+-- Este fichero es solo documentacion/lectura.
+-- La vista se crea o actualiza llamando a: CALL OPTIMIZED.SP_DEPLOY_OPTIMIZED()  (FASE 5)
+
+CREATE OR REPLACE VIEW OPTIMIZED.MONITORIZACION_PACIENTES AS
+SELECT
+    -- Identificador de la sesion
+    f.ID_SESION,
+
+    -- Fecha de la sesion
+    fe.FECHA,
+    fe.ANIO,
+    fe.TRIMESTRE,
+    fe.MES,
+    fe.NOMBRE_MES,
+    fe.NOMBRE_DIA,
+    fe.ES_FIN_SEMANA,
+
+    -- Paciente (version SCD2 activa)
+    pa.NOMBRE                   AS NOMBRE_PACIENTE,
+    pa.APELLIDOS                AS APELLIDOS_PACIENTE,
+    pa.FECHA_NACIMIENTO,
+    pa.GENERO,
+    pa.GRUPO_SANGUINEO,
+    pa.CIUDAD                   AS CIUDAD_PACIENTE,
+    pa.SEGURO_MEDICO,
+    pa.TIPO_SEGURO,
+
+    -- Medico responsable (version SCD2 activa)
+    me.NOMBRE                   AS NOMBRE_MEDICO,
+    me.APELLIDOS                AS APELLIDOS_MEDICO,
+    me.ESPECIALIDAD             AS ESPECIALIDAD_MEDICO,
+    me.NUMERO_COLEGIADO,
+
+    -- Equipo utilizado (version SCD2 activa)
+    eq.NOMBRE_EQUIPO,
+    eq.CLASE_RIESGO,
+    eq.ESTADO_EQUIPO,
+
+    -- Departamento
+    dp.NOMBRE_DEPARTAMENTO,
+
+    -- Ubicacion
+    ub.EDIFICIO,
+    ub.SALA,
+    ub.TIPO_SALA,
+
+    -- Diagnostico del paciente
+    di.CODIGO_CIE10,
+    di.DESCRIPCION_DIAGNOSTICO,
+    di.CATEGORIA                AS CATEGORIA_DIAGNOSTICO,
+    di.SUBCATEGORIA             AS SUBCATEGORIA_DIAGNOSTICO,
+    di.ES_CRONICO,
+
+    -- Medidas de la sesion
+    f.DURACION_MONITORIZACION_MIN,
+    f.FRECUENCIA_CARDIACA,
+    f.PRESION_SISTOLICA,
+    f.PRESION_DIASTOLICA,
+    f.TEMPERATURA,
+    f.SATURACION_OXIGENO,
+    f.NIVEL_GLUCOSA,
+    f.ALERTA_GENERADA
+
+FROM CONFORMED.FACT_MONITORIZACION_PACIENTES f
+JOIN CONFORMED.DIM_FECHA        fe ON fe.SK_FECHA        = f.SK_FECHA
+JOIN CONFORMED.DIM_PACIENTE     pa ON pa.SK_PACIENTE     = f.SK_PACIENTE     AND pa.ES_ACTUAL = TRUE
+JOIN CONFORMED.DIM_MEDICO       me ON me.SK_MEDICO       = f.SK_MEDICO       AND me.ES_ACTUAL = TRUE
+JOIN CONFORMED.DIM_EQUIPO       eq ON eq.SK_EQUIPO       = f.SK_EQUIPO       AND eq.ES_ACTUAL = TRUE
+JOIN CONFORMED.DIM_DEPARTAMENTO dp ON dp.SK_DEPARTAMENTO = f.SK_DEPARTAMENTO
+JOIN CONFORMED.DIM_UBICACION    ub ON ub.SK_UBICACION    = f.SK_UBICACION
+JOIN CONFORMED.DIM_DIAGNOSTICO  di ON di.SK_DIAGNOSTICO  = f.SK_DIAGNOSTICO;

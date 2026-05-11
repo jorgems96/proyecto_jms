@@ -39,6 +39,7 @@ CREATE OR REPLACE PROCEDURE CONFORMED.SP_MERGE_SCD1(
 RETURNS STRING
 LANGUAGE SQL
 AS
+$$
 DECLARE
     v_arr   ARRAY;
     v_n     INTEGER;
@@ -55,7 +56,7 @@ BEGIN
     v_icols := p_id;
     v_ivals := 's.' || p_id;
 
-    WHILE i < v_n DO
+    WHILE (i < v_n) DO
         v_col   := TRIM(GET(v_arr, i)::VARCHAR);
         v_set   := v_set  || IFF(i = 0, '',      ', ')  || 't.' || v_col || ' = s.' || v_col;
         v_cond  := v_cond || IFF(i = 0, '', ' OR ')     || 't.' || v_col || ' IS DISTINCT FROM s.' || v_col;
@@ -83,6 +84,7 @@ BEGIN
 
     RETURN 'SP_MERGE_SCD1 OK: ' || p_tabla;
 END;
+$$;
 
 
 -- ============================================================
@@ -111,6 +113,7 @@ CREATE OR REPLACE PROCEDURE CONFORMED.SP_MERGE_SCD1_SCD2(
 RETURNS STRING
 LANGUAGE SQL
 AS
+$$
 DECLARE
     v_arr1  ARRAY;
     v_n1    INTEGER;
@@ -132,7 +135,7 @@ BEGIN
     v_arr1 := STRTOK_TO_ARRAY(p_cols_scd1, ',');
     v_n1   := ARRAY_SIZE(v_arr1);
     i      := 0;
-    WHILE i < v_n1 DO
+    WHILE (i < v_n1) DO
         v_col   := TRIM(GET(v_arr1, i)::VARCHAR);
         v_set1  := v_set1  || IFF(i = 0, '',      ', ')  || 't.' || v_col || ' = s.' || v_col;
         v_cond1 := v_cond1 || IFF(i = 0, '', ' OR ')     || 't.' || v_col || ' IS DISTINCT FROM s.' || v_col;
@@ -145,7 +148,7 @@ BEGIN
     v_arr2 := STRTOK_TO_ARRAY(p_cols_scd2, ',');
     v_n2   := ARRAY_SIZE(v_arr2);
     i      := 0;
-    WHILE i < v_n2 DO
+    WHILE (i < v_n2) DO
         v_col   := TRIM(GET(v_arr2, i)::VARCHAR);
         v_cond2 := v_cond2 || IFF(i = 0, '', ' OR ') || 't.' || v_col || ' IS DISTINCT FROM s.' || v_col;
         v_icols := v_icols || ', ' || v_col;
@@ -187,3 +190,4 @@ BEGIN
 
     RETURN 'SP_MERGE_SCD1_SCD2 OK: ' || p_tabla;
 END;
+$$;
