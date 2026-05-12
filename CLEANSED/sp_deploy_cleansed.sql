@@ -113,7 +113,7 @@ BEGIN
 
         -- 4. Stream en esquema CLEANSED sobre tabla RAW (captura incrementales)
         v_sql :=
-            'CREATE OR REPLACE STREAM ' || v_esquema_cleansed || '.STREAM_' || v_table_name
+            'CREATE STREAM IF NOT EXISTS ' || v_esquema_cleansed || '.STREAM_' || v_table_name
             || ' ON TABLE ' || v_esquema_raw || '.' || v_table_name;
         EXECUTE IMMEDIATE :v_sql;
 
@@ -161,9 +161,7 @@ BEGIN
             || ' END';
         EXECUTE IMMEDIATE :v_sql;
 
-        -- 6. Activar task
-        v_sql := 'ALTER TASK ' || v_esquema_cleansed || '.TASK_' || v_table_name || ' RESUME';
-        EXECUTE IMMEDIATE :v_sql;
+        -- 6. Task creado como SUSPENDED por defecto en Snowflake.
 
     END FOR;
 

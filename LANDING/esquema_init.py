@@ -15,10 +15,11 @@ _FICHEROS_SETUP = [
     os.path.join(_ROOT, 'RAW',      'sp_deploy_raw.sql'),         # SP capa RAW
     os.path.join(_ROOT, 'CLEANSED', 'reglas_calidad.sql'),        # tabla de reglas de calidad
     os.path.join(_ROOT, 'CLEANSED', 'sp_deploy_cleansed.sql'),    # SP capa CLEANSED
-    os.path.join(_ROOT, 'CONFORMED', 'sp_merge_utils.sql'),       # SPs utiles SCD1/SCD2
+    os.path.join(_ROOT, 'CONFORMED', 'sp_scd_conformed.sql'),     # SPs genericos SCD1/SCD2 para dimensiones
     os.path.join(_ROOT, 'CONFORMED', 'sp_load_conformed.sql'),     # SP_LOAD_* de dimensiones y hechos
     os.path.join(_ROOT, 'CONFORMED', 'sp_deploy_conformed.sql'),  # DDL tablas + SP_DEPLOY_CONFORMED
-    os.path.join(_ROOT, 'OPTIMIZED', 'sp_deploy_optimized.sql'),           # CREATE SCHEMA + SP vistas
+    os.path.join(_ROOT, 'UTILS',     'control_tasks.sql'),          # SPs para activar/suspender tasks
+    os.path.join(_ROOT, 'OPTIMIZED', 'sp_deploy_optimized.sql'),  # CREATE SCHEMA + SP vistas
 ]
 
 

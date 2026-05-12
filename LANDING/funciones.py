@@ -6,6 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy import types as sa_types
 
 #NORMALIZACION INTERNA DE DLT 
+#para que no haya problemas con mayusculas,guiones y espacios
 def _to_snake_case(name: str) -> str:
     """Convierte CamelCase a snake_case para que coincida con la normalización interna de dlt."""
     name = re.sub(r'(?<=[a-z0-9])(?=[A-Z])', '_', name)

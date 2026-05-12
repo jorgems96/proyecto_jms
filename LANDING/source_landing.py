@@ -16,7 +16,7 @@ from datos import (
     SCHEMA_LANDING_PRODUCTOS, TABLA_PRODUCTOS,
     AZURE_CONTAINER_NAME
 )
-from utilidades import get_watermark, fetch_filas_incremental, get_column_hints
+from funciones import get_watermark, fetch_filas_incremental, get_column_hints
 
 
 # ---------------------------------------------------------------
