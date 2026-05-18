@@ -2,7 +2,7 @@
 -- Dimension SCD1/SCD2 de pacientes
 -- SCD1: Nombre, Apellidos, Fecha_Nacimiento, Genero, Telefono, Email, Grupo_Sanguineo
 -- SCD2: Direccion, Ciudad, Codigo_Postal, Seguro_Medico, Tipo_Seguro
--- Fuente: CLEANSED_MEDICARE.PACIENTES
+-- Fuente: CLEANSED.PACIENTES
 --
 -- Nota de nomenclatura: varios campos difieren entre el spec y la fuente.
 -- Se mantienen los nombres del spec en la dimension y se resuelve con alias en el SELECT:
@@ -52,7 +52,7 @@ CALL CONFORMED.SP_MERGE_SCD1_SCD2(
         CODIGO_POSTAL,
         COMPANIA_SEGURO                  AS SEGURO_MEDICO,
         TIPO_COBERTURA                   AS TIPO_SEGURO
-     FROM CLEANSED_MEDICARE.PACIENTES',
+     FROM CLEANSED.PACIENTES',
     'ID_PACIENTE',
     'NOMBRE,APELLIDOS,FECHA_NACIMIENTO,GENERO,TELEFONO,EMAIL,GRUPO_SANGUINEO',
     'DIRECCION,CIUDAD,CODIGO_POSTAL,SEGURO_MEDICO,TIPO_SEGURO'

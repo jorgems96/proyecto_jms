@@ -3,9 +3,9 @@
 -- Granularidad: una fila por visita (VISITAS_ENSAYO ya tiene granularidad diaria,
 --              no es necesario expandir rangos de fechas)
 -- Fuentes principales:
---   CLEANSED_MEDICARE.VISITAS_ENSAYO       (medidas y fecha de visita)
---   CLEANSED_MEDICARE.PARTICIPACION_ENSAYOS (claves de participacion y atributos junk)
---   CLEANSED_MEDICARE.ENSAYOS_CLINICOS     (CODIGO_DEPARTAMENTO para resolver SK_DEPARTAMENTO)
+--   CLEANSED.VISITAS_ENSAYO       (medidas y fecha de visita)
+--   CLEANSED.PARTICIPACION_ENSAYOS (claves de participacion y atributos junk)
+--   CLEANSED.ENSAYOS_CLINICOS     (CODIGO_DEPARTAMENTO para resolver SK_DEPARTAMENTO)
 --
 -- Nota de nomenclatura:
 --   ID_VISITA              → dimension degenerada (identificador unico de la visita)
@@ -96,11 +96,11 @@ SELECT
     v.RESULTADO_MEDICION_PRINCIPAL,
     v.RESULTADO_MEDICION_SECUNDARIA,
     v.NIVEL_EFICACIA
-FROM CLEANSED_MEDICARE.VISITAS_ENSAYO v
-JOIN CLEANSED_MEDICARE.PARTICIPACION_ENSAYOS  p   ON p.ID_PARTICIPACION    = v.ID_PARTICIPACION
-JOIN CLEANSED_MEDICARE.ENSAYOS_CLINICOS       ec  ON ec.ID_ENSAYO          = p.ID_ENSAYO
+FROM CLEANSED.VISITAS_ENSAYO v
+JOIN CLEANSED.PARTICIPACION_ENSAYOS  p   ON p.ID_PARTICIPACION    = v.ID_PARTICIPACION
+JOIN CLEANSED.ENSAYOS_CLINICOS       ec  ON ec.ID_ENSAYO          = p.ID_ENSAYO
 -- Resolver CODIGO_DEPARTAMENTO del ensayo a ID para el JOIN a la dimension
-JOIN CLEANSED_MEDICARE.DEPARTAMENTOS          dep_src ON dep_src.CODIGO_DEPARTAMENTO = ec.CODIGO_DEPARTAMENTO
+JOIN CLEANSED.DEPARTAMENTOS          dep_src ON dep_src.CODIGO_DEPARTAMENTO = ec.CODIGO_DEPARTAMENTO
 -- Dimensiones conformed
 JOIN CONFORMED.DIM_ENSAYO           en ON en.ID_ENSAYO       = p.ID_ENSAYO
 JOIN CONFORMED.DIM_PACIENTE         pa ON pa.ID_PACIENTE      = p.ID_PACIENTE      AND pa.ES_ACTUAL = TRUE

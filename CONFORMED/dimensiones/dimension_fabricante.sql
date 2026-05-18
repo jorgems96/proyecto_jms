@@ -1,6 +1,6 @@
 -- dimension_fabricante.sql
 -- Dimension SCD1 de fabricantes de equipos medicos
--- Fuente: CLEANSED_MEDICARE.FABRICANTES
+-- Fuente: CLEANSED.FABRICANTES
 --
 -- Nota de nomenclatura: NOMBRE_FABRICANTE se mapea desde RAZON_SOCIAL en la fuente.
 -- Se mantiene el nombre del spec en la dimension para mayor claridad en herramientas BI.
@@ -30,7 +30,7 @@ CALL CONFORMED.SP_MERGE_SCD1(
         EMAIL_CONTACTO,
         SITIO_WEB,
         CERTIFICACION_ISO
-     FROM CLEANSED_MEDICARE.FABRICANTES',
+     FROM CLEANSED.FABRICANTES',
     'ID_FABRICANTE',
     'NOMBRE_FABRICANTE,PAIS_ORIGEN,TELEFONO_CONTACTO,EMAIL_CONTACTO,SITIO_WEB,CERTIFICACION_ISO'
 );

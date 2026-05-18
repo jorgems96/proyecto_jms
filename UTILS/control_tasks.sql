@@ -18,13 +18,13 @@ DECLARE
     v_cuenta NUMBER DEFAULT 0;
     cur CURSOR FOR (
         SELECT
-            REPLACE(TABLE_SCHEMA, 'LANDING_', 'RAW_') AS raw_schema,
+            'RAW'      AS raw_schema,
             TABLE_NAME
         FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA LIKE 'LANDING_%'
+        WHERE TABLE_SCHEMA = 'LANDING'
           AND TABLE_TYPE = 'BASE TABLE'
           AND NOT STARTSWITH(UPPER(TABLE_NAME), '_DLT')
-        ORDER BY TABLE_SCHEMA, TABLE_NAME
+        ORDER BY TABLE_NAME
     );
 BEGIN
     FOR rec IN cur DO
@@ -51,13 +51,13 @@ DECLARE
     v_cuenta NUMBER DEFAULT 0;
     cur CURSOR FOR (
         SELECT
-            REPLACE(TABLE_SCHEMA, 'RAW_', 'CLEANSED_') AS cleansed_schema,
+            'CLEANSED' AS cleansed_schema,
             TABLE_NAME
         FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA LIKE 'RAW_%'
+        WHERE TABLE_SCHEMA = 'RAW'
           AND TABLE_TYPE = 'BASE TABLE'
           AND NOT STARTSWITH(UPPER(TABLE_NAME), '_DLT')
-        ORDER BY TABLE_SCHEMA, TABLE_NAME
+        ORDER BY TABLE_NAME
     );
 BEGIN
     FOR rec IN cur DO
@@ -116,13 +116,13 @@ DECLARE
     v_cuenta NUMBER DEFAULT 0;
     cur CURSOR FOR (
         SELECT
-            REPLACE(TABLE_SCHEMA, 'LANDING_', 'RAW_') AS raw_schema,
+            'RAW'      AS raw_schema,
             TABLE_NAME
         FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA LIKE 'LANDING_%'
+        WHERE TABLE_SCHEMA = 'LANDING'
           AND TABLE_TYPE = 'BASE TABLE'
           AND NOT STARTSWITH(UPPER(TABLE_NAME), '_DLT')
-        ORDER BY TABLE_SCHEMA, TABLE_NAME
+        ORDER BY TABLE_NAME
     );
 BEGIN
     FOR rec IN cur DO
@@ -148,13 +148,13 @@ DECLARE
     v_cuenta NUMBER DEFAULT 0;
     cur CURSOR FOR (
         SELECT
-            REPLACE(TABLE_SCHEMA, 'RAW_', 'CLEANSED_') AS cleansed_schema,
+            'CLEANSED' AS cleansed_schema,
             TABLE_NAME
         FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA LIKE 'RAW_%'
+        WHERE TABLE_SCHEMA = 'RAW'
           AND TABLE_TYPE = 'BASE TABLE'
           AND NOT STARTSWITH(UPPER(TABLE_NAME), '_DLT')
-        ORDER BY TABLE_SCHEMA, TABLE_NAME
+        ORDER BY TABLE_NAME
     );
 BEGIN
     FOR rec IN cur DO

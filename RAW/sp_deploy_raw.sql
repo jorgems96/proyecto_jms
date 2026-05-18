@@ -26,7 +26,7 @@ DECLARE
     cur CURSOR FOR (
         SELECT
             t.TABLE_SCHEMA                               AS esquema_landing,
-            REPLACE(t.TABLE_SCHEMA, 'LANDING_', 'RAW_') AS esquema_raw,
+            'RAW'                                        AS esquema_raw,
             t.TABLE_NAME,
             MIN(CASE WHEN STARTSWITH(UPPER(c.COLUMN_NAME), 'ID_') THEN c.COLUMN_NAME END) AS clave_primaria,
             LISTAGG(
@@ -48,7 +48,7 @@ DECLARE
         JOIN INFORMATION_SCHEMA.COLUMNS c
           ON c.TABLE_SCHEMA = t.TABLE_SCHEMA
          AND c.TABLE_NAME   = t.TABLE_NAME
-        WHERE t.TABLE_SCHEMA LIKE 'LANDING_%'
+        WHERE t.TABLE_SCHEMA = 'LANDING'
           AND t.TABLE_TYPE  = 'BASE TABLE'
           AND NOT STARTSWITH(UPPER(t.TABLE_NAME), '_DLT')
         GROUP BY t.TABLE_SCHEMA, t.TABLE_NAME

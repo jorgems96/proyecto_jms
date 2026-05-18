@@ -11,10 +11,10 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from conexiones import get_snowflake_connection
 from datos import (
-    TABLAS_MEDICARE, SCHEMA_LANDING_MEDICARE, CAMPO_CURSOR_MEDICARE_ORIGEN,
-    TABLAS_NEXTBIO, SCHEMA_LANDING_NEXTBIO, CAMPO_CURSOR_NEXTBIO,
-    SCHEMA_LANDING_PRODUCTOS, TABLA_PRODUCTOS,
-    AZURE_CONTAINER_NAME
+    SCHEMA_LANDING,
+    TABLAS_MEDICARE, CAMPO_CURSOR_MEDICARE_ORIGEN,
+    TABLAS_NEXTBIO, CAMPO_CURSOR_NEXTBIO,
+    TABLA_PRODUCTOS, AZURE_CONTAINER_NAME
 )
 from funciones import get_watermark, fetch_filas_incremental, get_column_hints
 
@@ -29,7 +29,7 @@ def load_medicare_landing() -> None:
     pipeline = dlt.pipeline(
         pipeline_name="medicare_to_landing",
         destination="snowflake",
-        dataset_name=SCHEMA_LANDING_MEDICARE,
+        dataset_name=SCHEMA_LANDING,
         pipelines_dir=r"C:\dlt_temp\medicare"
     )
 
@@ -38,7 +38,7 @@ def load_medicare_landing() -> None:
     print("\n[MEDICARE] Conectando a la base de datos origen...")
 
     for tabla_origen, tabla_landing in TABLAS_MEDICARE.items(): 
-        watermark = get_watermark(sf_conn, SCHEMA_LANDING_MEDICARE, tabla_landing, CAMPO_CURSOR_MEDICARE_ORIGEN)
+        watermark = get_watermark(sf_conn, SCHEMA_LANDING, tabla_landing, CAMPO_CURSOR_MEDICARE_ORIGEN)
         print(f"  [MEDICARE] -> Tabla: {tabla_origen}")
         ingestion_time = datetime.now()
 
@@ -68,7 +68,7 @@ def load_nextbio_landing() -> None:
     pipeline = dlt.pipeline(
         pipeline_name="nextbio_to_landing",
         destination="snowflake",
-        dataset_name=SCHEMA_LANDING_NEXTBIO,
+        dataset_name=SCHEMA_LANDING,
         pipelines_dir=r"C:\dlt_temp\nextbio"
     )
 
@@ -77,7 +77,7 @@ def load_nextbio_landing() -> None:
     print("\n[NEXTBIO] Conectando a la base de datos origen...")
 
     for tabla_origen, tabla_landing in TABLAS_NEXTBIO.items():
-        watermark = get_watermark(sf_conn, SCHEMA_LANDING_NEXTBIO, tabla_landing, CAMPO_CURSOR_NEXTBIO)
+        watermark = get_watermark(sf_conn, SCHEMA_LANDING, tabla_landing, CAMPO_CURSOR_NEXTBIO)
         print(f"  [NEXTBIO] -> Tabla: {tabla_origen}")
         ingestion_time = datetime.now()
 
@@ -107,7 +107,7 @@ def load_productos_landing() -> None:
     sf_conn = get_snowflake_connection()
     cursor = sf_conn.cursor()
     try:
-        cursor.execute(f"SELECT DISTINCT FICHERO_ORIGEN FROM {SCHEMA_LANDING_PRODUCTOS}.{TABLA_PRODUCTOS}")
+        cursor.execute(f"SELECT DISTINCT FICHERO_ORIGEN FROM {SCHEMA_LANDING}.{TABLA_PRODUCTOS}")
         ficheros_procesados = {row[0] for row in cursor.fetchall()}
     except Exception:
         ficheros_procesados = set()
@@ -134,7 +134,7 @@ def load_productos_landing() -> None:
     pipeline = dlt.pipeline(
         pipeline_name="productos_to_landing",
         destination="snowflake",
-        dataset_name=SCHEMA_LANDING_PRODUCTOS,
+        dataset_name=SCHEMA_LANDING,
         pipelines_dir=r"C:\dlt_temp\productos"
     )
 

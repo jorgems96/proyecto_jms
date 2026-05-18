@@ -26,7 +26,7 @@ DECLARE
     cur CURSOR FOR (
         SELECT
             ca.TABLE_SCHEMA                                AS esquema_raw,
-            REPLACE(ca.TABLE_SCHEMA, 'RAW_', 'CLEANSED_') AS esquema_cleansed,
+            'CLEANSED'                                     AS esquema_cleansed,
             ca.TABLE_NAME,
             ca.clave_primaria,
             ca.insert_cols,
@@ -54,7 +54,7 @@ DECLARE
             JOIN INFORMATION_SCHEMA.COLUMNS c
               ON c.TABLE_SCHEMA = t.TABLE_SCHEMA
              AND c.TABLE_NAME   = t.TABLE_NAME
-            WHERE t.TABLE_SCHEMA LIKE 'RAW_%'
+            WHERE t.TABLE_SCHEMA = 'RAW'
               AND t.TABLE_TYPE  = 'BASE TABLE'
               AND NOT STARTSWITH(UPPER(t.TABLE_NAME), '_DLT')
             GROUP BY t.TABLE_SCHEMA, t.TABLE_NAME

@@ -1,6 +1,6 @@
 -- dimension_ensayo.sql
 -- Dimension SCD1 de ensayos clinicos
--- Fuente: CLEANSED_MEDICARE.ENSAYOS_CLINICOS
+-- Fuente: CLEANSED.ENSAYOS_CLINICOS
 --
 -- Nota de nomenclatura: tres columnas tienen nombres distintos entre la fuente y el spec.
 -- Se mantienen los nombres del spec en la dimension y se resuelve con alias en el SELECT.
@@ -37,7 +37,7 @@ CALL CONFORMED.SP_MERGE_SCD1(
         ESTADO_ENSAYO,
         OBJETIVO_PRINCIPAL,
         MOLECULA_FARMACO
-     FROM CLEANSED_MEDICARE.ENSAYOS_CLINICOS',
+     FROM CLEANSED.ENSAYOS_CLINICOS',
     'ID_ENSAYO',
     'CODIGO_ENSAYO,NOMBRE_ENSAYO,DESCRIPCION,PATROCINADOR,FECHA_INICIO_ENSAYO,FECHA_FIN_PREVISTA,ESTADO_ENSAYO,OBJETIVO_PRINCIPAL,MOLECULA_FARMACO'
 );

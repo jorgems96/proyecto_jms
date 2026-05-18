@@ -1,6 +1,6 @@
 -- dimension_diagnostico.sql
 -- Dimension SCD1 de diagnosticos CIE-10
--- Fuente: CLEANSED_MEDICARE.DIAGNOSTICOS_CIE10
+-- Fuente: CLEANSED.DIAGNOSTICOS_CIE10
 --
 -- Nota de nomenclatura: los nombres de columna de la dimension difieren de la fuente
 -- en tres campos. Se mantienen los nombres del spec (DESCRIPCION_DIAGNOSTICO,
@@ -32,7 +32,7 @@ CALL CONFORMED.SP_MERGE_SCD1(
         CAPITULO     AS CATEGORIA,
         GRUPO        AS SUBCATEGORIA,
         ES_CRONICO
-     FROM CLEANSED_MEDICARE.DIAGNOSTICOS_CIE10',
+     FROM CLEANSED.DIAGNOSTICOS_CIE10',
     'ID_DIAGNOSTICO',
     'CODIGO_CIE10,DESCRIPCION_DIAGNOSTICO,CATEGORIA,SUBCATEGORIA,ES_CRONICO'
 );

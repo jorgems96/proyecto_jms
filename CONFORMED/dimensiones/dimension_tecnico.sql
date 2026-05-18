@@ -2,7 +2,7 @@
 -- Dimension SCD1/SCD2 de tecnicos de mantenimiento
 -- SCD1: Nombre, Apellidos, Especialidad, Anios_Experiencia, Telefono, Email
 -- SCD2: Departamento, Nivel_Certificacion
--- Fuente: CLEANSED_MEDICARE.TECNICOS
+-- Fuente: CLEANSED.TECNICOS
 --
 -- Nota de nomenclatura:
 -- NOMBRE_TECNICO                     → NOMBRE (APELLIDOS pendiente de confirmar con profesor)
@@ -47,8 +47,8 @@ CALL CONFORMED.SP_MERGE_SCD1_SCD2(
             WHEN 3 THEN ''Especialista''
             WHEN 4 THEN ''Jefe''
         END                  AS NIVEL_CERTIFICACION
-     FROM CLEANSED_MEDICARE.TECNICOS tc
-     LEFT JOIN CLEANSED_MEDICARE.DEPARTAMENTOS dep ON dep.ID_DEPARTAMENTO = tc.ID_DEPARTAMENTO',
+     FROM CLEANSED.TECNICOS tc
+     LEFT JOIN CLEANSED.DEPARTAMENTOS dep ON dep.ID_DEPARTAMENTO = tc.ID_DEPARTAMENTO',
     'ID_TECNICO',
     'NOMBRE,ESPECIALIDAD,ANIOS_EXPERIENCIA,TELEFONO,EMAIL',
     'DEPARTAMENTO,NIVEL_CERTIFICACION'
