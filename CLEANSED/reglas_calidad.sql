@@ -1,5 +1,6 @@
 -- reglas_calidad.sql
--- Tabla de configuracion de reglas de calidad para la capa CLEANSED.
+
+-- Para crear la Tabla de configuracion de reglas de calidad para la capa CLEANSED.
 -- Cada fila almacena un fragmento SQL listo para usar como condicion WHERE.
 -- Las filas que cumplan TODAS las condiciones de su tabla van a CLEANSED.
 -- Las que fallen alguna van a CLEANSED._ERRORS.
@@ -15,9 +16,9 @@
 CREATE SCHEMA IF NOT EXISTS CLEANSED;
 
 CREATE OR REPLACE TABLE CLEANSED.REGLAS_CALIDAD (
-    NOMBRE_TABLA VARCHAR(100)  NOT NULL,
-    COLUMNA      VARCHAR(100)  NOT NULL,
-    CONDICION    VARCHAR(1000) NOT NULL
+    NOMBRE_TABLA VARCHAR(100)  NOT NULL, -- para identificar a qué tabla se aplica la regla
+    COLUMNA      VARCHAR(100)  NOT NULL, -- para identificar a qué columna se refiere la regla (puede ser NULL si la regla no es sobre una columna específica)
+    CONDICION    VARCHAR(1000) NOT NULL  -- fragmento SQL con la condición a evaluar
 );
 
 INSERT INTO CLEANSED.REGLAS_CALIDAD (NOMBRE_TABLA, COLUMNA, CONDICION) VALUES

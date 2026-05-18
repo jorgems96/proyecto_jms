@@ -1,8 +1,8 @@
 import sys
 sys.dont_write_bytecode = True
-import os
-import shutil
-import time
+import os 
+import shutil #para eliminar carpetas dlt_temp en el reset del proyecto
+import time  #para medir duracion de fases y ejecucion completa
 
 
 _BASE = os.path.dirname(os.path.abspath(__file__))
@@ -13,13 +13,14 @@ import source_landing
 import esquema_init
 from conexiones import get_snowflake_connection
 
-_CONFORMED_OBJETOS = [
+_CONFORMED_OBJETOS = [ #esto es para el menu de carga individual de objetos conformados, se llama al SP_LOAD_ correspondiente
     'DIM_FECHA', 'DIM_DEPARTAMENTO', 'DIM_UBICACION', 'DIM_FABRICANTE',
     'DIM_MEDICO', 'DIM_TECNICO', 'DIM_PACIENTE', 'DIM_EQUIPO',
     'DIM_ENSAYO', 'DIM_DIAGNOSTICO',
     'DIM_PERFIL_MANTENIMIENTO', 'DIM_PERFIL_ENSAYO',
     'FACT_MANTENIMIENTO_EQUIPOS', 'FACT_MONITORIZACION_PACIENTES', 'FACT_ENSAYOS_CLINICOS',
 ]
+
 
 _DLT_TEMP_DIRS = [
     r"C:\dlt_temp\medicare",
@@ -29,7 +30,7 @@ _DLT_TEMP_DIRS = [
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helpers: ejecutar SQL y medir duracion de las fases 
 # ---------------------------------------------------------------------------
 
 def _ejecutar_sql(conn, sql, descripcion):
@@ -54,8 +55,8 @@ def _duracion(t0):
     segundos = time.perf_counter() - t0
     return f"{segundos:.1f}s" if segundos < 60 else f"{int(segundos)//60}m {int(segundos)%60}s"
 
-
-def fase0():
+#
+def fase0():  #esta fase ejecuta el fichero esquema.sql que crea la base de datos, los esquemas y los procedimientos almacenados necesarios para el proyecto
     print("\n--- FASE 0: ESQUEMAS Y PROCEDIMIENTOS ALMACENADOS ---")
     t0 = time.perf_counter()
     esquema_init.ejecutar_esquema()
@@ -112,7 +113,7 @@ def activar_tasks():
 
 
 def suspender_tasks():
-    print("\n--- SUSPENDER TASKS (PARAR CARGA INCREMENTAL CDC) ---")
+    print("\n--- SUSPENDER TASKS (CARGA INCREMENTAL CDC) ---")
     t0 = time.perf_counter()
     _snowflake("CALL RAW.SP_SUSPENDER_TASKS()",       "RAW tasks suspendidos")
     _snowflake("CALL CLEANSED.SP_SUSPENDER_TASKS()",  "CLEANSED tasks suspendidos")

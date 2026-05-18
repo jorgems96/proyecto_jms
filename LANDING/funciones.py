@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 import sqlalchemy as sa
 from sqlalchemy import types as sa_types
 
+#AQui van funciones auxiliares para la carga incremental
+# y la normalizacion de nombres y tipos entre SQLAlchemy y dlt.
+
+
 #NORMALIZACION INTERNA DE DLT 
 #para que no haya problemas con mayusculas,guiones y espacios
 def _to_snake_case(name: str) -> str:
@@ -12,9 +16,8 @@ def _to_snake_case(name: str) -> str:
     name = re.sub(r'(?<=[a-z0-9])(?=[A-Z])', '_', name)
     return name.lower()
 
-#PARA LA CARGA INCREMENTAL: WATERMARK Y FILTRADO EN ORIGEN
-#funcionamieno: get_watermark obtiene el maximo valor del campo de fecha en la tabla destino (Snowflake) 
-# para saber hasta donde se ha cargado. Si no hay datos, devuelve None.
+#Consulta en Snowflake el MAX(fecha_modificacion) de una tabla ya cargada. 
+# Si la tabla no existe o está vacía devuelve None (señal de primera carga)
 def get_watermark(sf_conn, schema, tabla, campo_cursor):
     """Devuelve el MAX de la columna de fecha ya cargada en Snowflake para esa tabla.
     Devuelve None si la tabla no existe o está vacía (primera carga: SELECT * sin filtro)."""
@@ -30,18 +33,17 @@ def get_watermark(sf_conn, schema, tabla, campo_cursor):
     finally:
         cursor.close()
 
-#PARA LA CARGA INCREMENTAL: EJECUTAR SELECT CON FILTRO DE WATERMARK
+#Ejecuta el SELECT en el origen: si watermark=None trae todo (SELECT *), 
+#si hay watermark trae solo las filas posteriores (WHERE fecha_modificacion > watermark). 
+#El +1ms es un ajuste técnico para evitar perder filas por diferencia de precisión entre SQL Server y Snowflake.
+#A cada fila le añade fecha_ingestion con el momento actual
 def fetch_filas_incremental(conn, tabla_origen, campo_cursor, watermark, ingestion_time):
     """Ejecuta SELECT sobre la tabla origen con filtro incremental si hay watermark.
     Devuelve lista de dicts con fecha_ingestion añadida."""
     if watermark is None:
         result = conn.execute(sa.text(f"SELECT * FROM {tabla_origen}"))
     else:
-        # Snowflake almacena timestamps con precision de ms (3 decimales). SQL Server datetime
-        # usa ticks de 1/300s (3.333ms). El watermark de Snowflake pierde la fraccion de tick
-        # (ej: SQL Server 943.333ms -> Snowflake 943ms). Con +1ms el umbral queda en 944ms,
-        # que excluye el tick actual (943.333ms) pero incluye el siguiente (946.666ms).
-        # Es seguro porque entre ticks consecutivos de SQL Server hay minimo 3.333ms.
+        # esto es porque Snowflake almacena timestamps con precision de ms (3 decimales).
         wm = watermark.replace(tzinfo=None) if getattr(watermark, 'tzinfo', None) else watermark
         wm = wm + timedelta(milliseconds=1)
         result = conn.execute(

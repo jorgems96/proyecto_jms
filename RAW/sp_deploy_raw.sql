@@ -1,6 +1,9 @@
 -- sp_deploy_raw.sql
--- Sustituye a landing_raw.py: crea esquemas, tablas, streams y tasks RAW
+
+
+--crea esquemas, tablas, streams y tasks RAW
 -- automaticamente a partir de las tablas LANDING_ detectadas en INFORMATION_SCHEMA.
+
 
 CREATE OR REPLACE PROCEDURE RAW.SP_DEPLOY_RAW()
 RETURNS STRING

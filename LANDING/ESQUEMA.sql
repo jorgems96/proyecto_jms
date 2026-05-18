@@ -1,3 +1,6 @@
+--este fichero se encarga de crear la base de datos y los esquemas
+
+
 ------------------------------------------------BASE DE DATOS DEL PROYECTO
 CREATE DATABASE IF NOT EXISTS PROYECTO;
 
@@ -18,11 +21,11 @@ CREATE SCHEMA IF NOT EXISTS PROYECTO.CLEANSED_MEDICARE;
 CREATE SCHEMA IF NOT EXISTS PROYECTO.CLEANSED_NEXTBIO;
 CREATE SCHEMA IF NOT EXISTS PROYECTO.CLEANSED_PRODUCTOS;
 
+CREATE SCHEMA IF NOT EXISTS PROYECTO.CLEANSED;
+
 
 -----------------------------------------------------------CAPA CONFORMED
 CREATE SCHEMA IF NOT EXISTS PROYECTO.CONFORMED;
-
-
 
 
 ------------------------------------------------------CAPA OPTIMIZED

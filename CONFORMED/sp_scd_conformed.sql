@@ -12,7 +12,7 @@
 -- DIMENSIONES NO CUBIERTAS (lógica especial, quedan con SQL propio):
 --   DIM_DEPARTAMENTO  — CTE recursiva + subconsulta correlacionada en SET
 --   DIM_FECHA         — CREATE OR REPLACE TABLE AS SELECT (generador de fechas)
---   DIM_PERFIL_*      — dimensiones junk sin UPDATE, INSERT via CROSS JOIN
+--   DIM_PERFIL_*      — dimensiones junk sin UPDATE, INSERT via CROSS JOIN (PERFIL_MANTENIMIENTO, PERFIL_ENSAYO)
 
 CREATE SCHEMA IF NOT EXISTS CONFORMED;
 
@@ -89,7 +89,7 @@ $$;
 
 -- ============================================================
 -- SP_MERGE_SCD1_SCD2
---
+--Explicaciones: 
 --   p_tabla     — tabla destino
 --   p_fuente    — SELECT que devuelve p_id + cols SCD1 + cols SCD2,
 --                 con aliases ya aplicados (query único para los 3 pasos)

@@ -1,0 +1,35 @@
+--FUNCIONAMIENTO DEL PROYECTO-- 
+
+--FASE 0--
+
+La FASE 0 registra en Snowflake toda la "infraestructura" del proyecto — esquemas, 
+tablas de control y procedimientos almacenados — sin mover ningún dato. 
+Es el paso previo obligatorio para que el resto de fases funcionen.
+
+Ficheros ejecutados en esta fase: 
+
+--ESQUEMA.sql — crea los esquemas base: RAW, CLEANSED, CONFORMED, OPTIMIZED y la tabla CLEANSED.REGLAS_CALIDAD.
+
+--sp_deploy_raw.sql — registra SP_DEPLOY_RAW, el procedimiento que en FASE 2 creará dinámicamente los esquemas, 
+tablas, streams y tasks de la capa RAW.
+
+--reglas_calidad.sql — inserta las reglas de validación en CLEANSED.REGLAS_CALIDAD 
+(condiciones que definen qué filas son válidas o inválidas en cada tabla).
+
+--sp_deploy_cleansed.sql — registra SP_DEPLOY_CLEANSED, el procedimiento que en FASE 3 creará los esquemas,
+ tablas, streams y tasks de CLEANSED aplicando esas reglas.
+
+--sp_scd_conformed.sql — registra los dos helpers genéricos SP_MERGE_SCD1 y SP_MERGE_SCD1_SCD2, 
+reutilizados por todos los SP_LOAD de dimensiones.
+
+--sp_load_conformed.sql — registra todos los SP_LOAD_DIM_* y SP_LOAD_FACT_*, 
+los procedimientos que cargan cada dimensión y hecho en CONFORMED.
+
+--sp_deploy_conformed.sql — registra SP_DEPLOY_CONFORMED, el procedimiento que en FASE 4 
+crea las tablas dimensionales/de hechos, los streams sobre CLEANSED y el DAG de tasks.
+
+--control_tasks.sql — registra los 6 SPs de control de tasks 
+(SP_ACTIVAR_TASKS y SP_SUSPENDER_TASKS para RAW, CLEANSED y CONFORMED).
+
+--sp_deploy_optimized.sql — registra SP_DEPLOY_OPTIMIZED, 
+el procedimiento que en FASE 5 crea las 3 vistas finales 
