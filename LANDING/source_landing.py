@@ -47,7 +47,7 @@ def load_medicare_landing() -> None:
             filas = fetch_filas_incremental(conn, tabla_origen, CAMPO_CURSOR_MEDICARE_ORIGEN, watermark, ingestion_time)
 
         if filas:
-            run_pipeline_seguro(pipeline, filas, table_name=tabla_landing, write_disposition="append", columns=column_hints)
+            run_pipeline_seguro(pipeline, filas, table_name=tabla_landing, write_disposition="append", columns=column_hints, loader_file_format="parquet")
             print(f"   [MEDICARE] OK: {len(filas)} filas nuevas cargadas en {tabla_origen}.")
         else:
             print(f"   [MEDICARE] OK: Sin cambios en {tabla_origen}.")
@@ -86,7 +86,7 @@ def load_nextbio_landing() -> None:
             filas = fetch_filas_incremental(conn, tabla_origen, CAMPO_CURSOR_NEXTBIO, watermark, ingestion_time)
 
         if filas:
-            run_pipeline_seguro(pipeline, filas, table_name=tabla_landing, write_disposition="append", columns=column_hints)
+            run_pipeline_seguro(pipeline, filas, table_name=tabla_landing, write_disposition="append", columns=column_hints, loader_file_format="parquet")
             print(f"  [NEXTBIO]   OK: {len(filas)} filas nuevas cargadas en {tabla_origen}.")
         else:
             print(f"  [NEXTBIO]   OK: Sin cambios en {tabla_origen}.")
@@ -153,7 +153,7 @@ def load_productos_landing() -> None:
             fila["fecha_ingestion"] = ingestion_time
             datos.append(dict(fila))
 
-        run_pipeline_seguro(pipeline, datos, table_name=TABLA_PRODUCTOS, write_disposition="append")
+        run_pipeline_seguro(pipeline, datos, table_name=TABLA_PRODUCTOS, write_disposition="append", loader_file_format="parquet")
         print(f"  [PRODUCTOS CSV]   OK: {len(datos)} filas cargadas del fichero {fichero}.")
 
     sf_conn.close()

@@ -21,7 +21,7 @@ BEGIN
     -- -------------------------------------------------------
     -- Vista 1: Mantenimiento de equipos
     -- -------------------------------------------------------
-    CREATE OR REPLACE VIEW OPTIMIZED.MANTENIMIENTO_EQUIPOS AS
+    CREATE OR REPLACE VIEW OPTIMIZED.FACT_MANTENIMIENTO_EQUIPOS AS
     SELECT
         f.ID_ORDEN,
         fe.FECHA, fe.ANIO, fe.SEMESTRE, fe.TRIMESTRE, fe.MES, fe.NOMBRE_MES,
@@ -51,7 +51,7 @@ BEGIN
     -- -------------------------------------------------------
     -- Vista 2: Monitorizacion de pacientes
     -- -------------------------------------------------------
-    CREATE OR REPLACE VIEW OPTIMIZED.MONITORIZACION_PACIENTES AS
+    CREATE OR REPLACE VIEW OPTIMIZED.FACT_MONITORIZACION_PACIENTES AS
     SELECT
         f.ID_SESION,
         fe.FECHA, fe.ANIO, fe.TRIMESTRE, fe.MES, fe.NOMBRE_MES, fe.NOMBRE_DIA, fe.ES_FIN_SEMANA,
@@ -81,7 +81,7 @@ BEGIN
     -- -------------------------------------------------------
     -- Vista 3: Ensayos clinicos
     -- -------------------------------------------------------
-    CREATE OR REPLACE VIEW OPTIMIZED.ENSAYOS_CLINICOS AS
+    CREATE OR REPLACE VIEW OPTIMIZED.FACT_ENSAYOS_CLINICOS AS
     SELECT
         f.ID_PARTICIPACION,
         fv.FECHA AS FECHA_VISITA, fv.ANIO AS ANIO_VISITA,
